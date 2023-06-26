@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : Singleton<GameManager>
+public class GameManager : SingleDarwin
 {
-
+    private static GameManager instance;
+    public static GameManager Instance { get => instance; }
     public float spawnTime;
-    public Bird[] birdPrefabs;
     bool m_isGameOver;
 
     public int timeLimt;
@@ -18,15 +18,14 @@ public class GameManager : Singleton<GameManager>
 
     public override void Awake() 
     {
-        MakeSingleton(false);
+        GameManager.instance = this ;
         m_curentTimeLimit = timeLimt;
         // PlayerPrefs.DeleteAll();
     }
 
-    public override void Start() {
-        GameGUIManager.Ins.ShowGameGui(false);
-
-        GameGUIManager.Ins.UpdateKilledCouting(m_birdKilled);
+    public void Start() {
+        GameGUIManager.Instance.ShowGameGui(false);
+        GameGUIManager.Instance.UpdateKilledCouting(m_birdKilled);
 
     }
 
@@ -35,71 +34,37 @@ public class GameManager : Singleton<GameManager>
 
         StartCoroutine(TimeCountDown());
 
-        GameGUIManager.Ins.ShowGameGui(true);
-    }
-    
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        GameGUIManager.Instance.ShowGameGui(true);
     }
 
     IEnumerator TimeCountDown(){
         while(m_curentTimeLimit > 0){
             yield return new WaitForSeconds(1f);
-             m_curentTimeLimit --;
+            m_curentTimeLimit --;
 
             if(m_curentTimeLimit <= 0 ){
                 m_isGameOver = true;
 
                 if(m_birdKilled > Prefs.bestScore){
-                     GameGUIManager.Ins.gameDialog.UpdateDialog("NEW BEST", "BEST KILLED : X "+ m_birdKilled);
+                    GameGUIManager.Instance.gameDialog.UpdateDialog("NEW BEST", "BEST KILLED : X "+ m_birdKilled);
                 }
                 else{
-                     GameGUIManager.Ins.gameDialog.UpdateDialog("YOUR BEST", "BEST KILLED : X "+ Prefs.bestScore);
+                    GameGUIManager.Instance.gameDialog.UpdateDialog("YOUR BEST", "BEST KILLED : X "+ Prefs.bestScore);
                 }
                 Prefs.bestScore = m_birdKilled;
-                // GameGUIManager.Ins.gameDialog.UpdateDialog("YOUR BEST", "BEST KILLED : X "+ m_birdKilled);
-                GameGUIManager.Ins.gameDialog.Show(true);
-                GameGUIManager.Ins.CurDialog = GameGUIManager.Ins.gameDialog;
-
-                
+                // GameGUIManager.Instance.gameDialog.UpdateDialog("YOUR BEST", "BEST KILLED : X "+ m_birdKilled);
+                GameGUIManager.Instance.gameDialog.Show(true);
+                GameGUIManager.Instance.CurDialog = GameGUIManager.Instance.gameDialog;    
             }
-            GameGUIManager.Ins.UpdateTimer(IntToTime(m_curentTimeLimit));
+            GameGUIManager.Instance.UpdateTimer(IntToTime(m_curentTimeLimit));
         }
     }
 
     IEnumerator GameSpawn(){
         while(! m_isGameOver){
-            SpawnBird();
-            yield return new WaitForSeconds(spawnTime);
-           
+            SpawnBird.Instance.SpawningBird();
+            yield return new WaitForSeconds(spawnTime); 
         }
-    }
-
-    void SpawnBird(){
-        Vector3 spawnPos = Vector3.zero;
-
-        float randCheck = Random.Range(0f, 1f);
-
-        if(randCheck > 0.5f){
-            spawnPos = new Vector3(11.5f , Random.Range(-1.5f , 3.5f) , 0);
-        }
-        else{
-            spawnPos = new Vector3(-11.5f , Random.Range(-1.5f , 3.5f) , 0);
-        } 
-
-        if(birdPrefabs != null && birdPrefabs.Length > 0){
-            int randIdx = Random.Range(0 , birdPrefabs.Length);
-
-            if(birdPrefabs[randIdx] != null){
-                Bird birdClone = Instantiate(birdPrefabs[randIdx] , spawnPos , Quaternion.identity);
-
-            }
-        } 
-        
-          
     }
 
     string IntToTime(int time){

@@ -2,21 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BGController : Singleton<BGController>
+public class BGController : SingleDarwin
 {
-
+    private static BGController instance;
+    public static BGController Instance { get => instance;}
     public Sprite[] sprites;
-
     public SpriteRenderer bgImage;
 
+
     public override void Awake() {
-        MakeSingleton(false);
-        
+        BGController.instance = this;
     }
 
-    public override void Start() {
-        ChangeSprite();
-        
+    public void Start() {
+        ChangeSprite();  
     }
 
     void ChangeSprite(){

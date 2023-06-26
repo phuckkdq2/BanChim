@@ -42,8 +42,7 @@ public class Player : MonoBehaviour
 
                 m_curFireRate = fireRate;
             }
-
-            GameGUIManager.Ins.UpdateFireRate(m_curFireRate/fireRate);
+            GameGUIManager.Instance.UpdateFireRate(m_curFireRate/fireRate);
         }
 
         if(m_viewFinderClone){
@@ -70,14 +69,13 @@ public class Player : MonoBehaviour
 
                     if(bird){
                         bird.Die();
-                       
                     }
                 }
             }
         }
-        CineController.Ins.ShakeTrigger();
+        CineController.Instance.ShakeTrigger();
 
-        AudioController.Ins.PlaySound(AudioController.Ins.shooting);
+        AudioController.Instance.PlaySound(AudioController.Instance.shooting);
         
     }
 }

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 
-public class CineController : Singleton<CineController>
+public class CineController : SingleDarwin
 {
+    private static CineController instance;
+    public static CineController Instance { get => instance;}
     public float shakeDuration = 0.3f;          // Time the Camera Shake effect will last
     public float shakeAmplitude = 1.2f;         // Cinemachine Noise Profile Parameter
     public float shakeFrequency = 2.0f;         // Cinemachine Noise Profile Parameter
@@ -15,14 +17,15 @@ public class CineController : Singleton<CineController>
     public CinemachineVirtualCamera virtualCamera;
     private CinemachineBasicMultiChannelPerlin m_virtualCameraNoise;
 
-    public override void Awake()
-    {
-        MakeSingleton(false);
+          
+
+    public override void Awake() {
+        CineController.instance = this;
     }
 
-    public override void Start()
+
+    public  void Start()
     {
-        base.Start();
         // Get Virtual Camera Noise Profile
         if (virtualCamera != null)
             m_virtualCameraNoise = virtualCamera.GetCinemachineComponent<Cinemachine.CinemachineBasicMultiChannelPerlin>();
